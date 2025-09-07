@@ -3,9 +3,9 @@ import json
 
 URL = "https://jsonplaceholder.typicode.com/posts/"
 
-id_file = open("caches\\ids.json")
-id_data_str = id_file.read()
-ids_json_data = json.loads(id_data_str)
+with open("caches/ids.json") as id_file:
+    id_data_str = id_file.read()
+    ids_json_data = json.loads(id_data_str)
 
 while True:
     input_id_str = input("Enter Id: ")
@@ -17,10 +17,12 @@ while True:
 
             if input_id_str in ids_json_data:
                 data = ids_json_data[input_id_str]
+                is_pulled_from_cahce = True
 
             else:
                 response = requests.get(url)
                 data = response.json()
+                is_pulled_from_cahce = False
 
                 ids_json_data[str(data["id"])] = {
                     "userId": data["userId"],
@@ -29,6 +31,11 @@ while True:
                 }
 
             while True:
+                if is_pulled_from_cahce:
+                    print("Data is pulled from cache\n")
+                else:
+                    print("Fetched from API\n")
+
                 user_requested_data = input("Enter the data you want to get (userId, id, title, body) 'all' to get all type, 'e' to exit\n: ")
 
                 if user_requested_data == "e":
@@ -60,5 +67,5 @@ while True:
         print(f"Given id '{input_id_str}' is not an integer please enter again\n")
         continue
 
-json_file = open("caches\\ids.json", 'w')
-json.dump(ids_json_data, json_file)
+with open("caches\\ids.json", 'w') as json_file:
+    json.dump(ids_json_data, json_file, indent=4)
